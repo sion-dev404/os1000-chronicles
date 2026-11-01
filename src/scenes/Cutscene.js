@@ -27,36 +27,9 @@ export class Cutscene extends Phaser.Scene {
 
     this.drawArt();
     this.drawText();
-    this.weatherCheck = this.checkWeatherData();
-    this.weatherCheck?.then((available) => {
-      if (!available) this.forceOs1000();
-    });
 
     this.input.on('pointerdown', () => { if (this.typing) this.finishTyping(); });
     sfx.glitch();
-  }
-
-  checkWeatherData() {
-    if (this.ch !== CHAPTERS.length - 2) return null;
-
-    return Promise.resolve()
-      .then(() => fetch(`${import.meta.env.BASE_URL}weather.json`))
-      .then((response) => {
-        if (!response.ok) throw new Error(`weather.json request failed: ${response.status}`);
-        return response.json();
-      })
-      .then(() => true)
-      .catch(() => false);
-  }
-
-  forceOs1000() {
-    if (this.leaving) return;
-    this.leaving = true;
-    this.typer?.remove();
-    this.cameras.main.fadeOut(400, 0, 0, 0);
-    this.cameras.main.once('camerafadeoutcomplete', () => {
-      this.scene.start('Cutscene', { ch: CHAPTERS.length - 1 });
-    });
   }
 
   drawArt() {
@@ -142,19 +115,6 @@ export class Cutscene extends Phaser.Scene {
   }
 
   leave() {
-    if (this.leaving) return;
-    if (this.weatherCheck) {
-      this.weatherCheck.then((available) => {
-        if (this.leaving) return;
-        if (available) this.continue();
-        else this.forceOs1000();
-      });
-      return;
-    }
-    this.continue();
-  }
-
-  continue() {
     if (this.leaving) return;
     this.leaving = true;
     this.typer?.remove();
