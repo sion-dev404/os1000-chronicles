@@ -4,7 +4,7 @@ import { W, H } from './ui.js';
 import { Title } from './scenes/Title.js';
 import { Cutscene } from './scenes/Cutscene.js';
 import { Ending } from './scenes/Ending.js';
-import { Typing } from './games/Typing.js';
+import { Spell } from './games/Spell.js';
 import { Virus } from './games/Virus.js';
 import { Popup } from './games/Popup.js';
 import { OsOrder } from './games/OsOrder.js';
@@ -28,6 +28,6 @@ fontsReady.then(() => {
     backgroundColor: '#0b0d14',
     scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH },
     input: { activePointers: 3 },
-    scene: [Title, Cutscene, Typing, Virus, Popup, OsOrder, Dodge, Timing, Whack, Boss, Ending],
+    scene: [Title, Cutscene, Spell, Virus, Popup, OsOrder, Dodge, Timing, Whack, Boss, Ending],
   });
 });

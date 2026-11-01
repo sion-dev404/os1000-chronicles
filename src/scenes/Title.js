@@ -29,7 +29,7 @@ export class Title extends Phaser.Scene {
       }
     }
 
-    T(this, W / 2, H - 30, '8개의 장 · 컷신과 미니게임 · 클릭, 터치, 키보드 지원', 12, C.dim);
+    T(this, W / 2, H - 30, '8개의 장 · 컷신과 미니게임 · 터치와 클릭만으로 플레이', 12, C.dim);
 
     this.mute = T(this, W - 28, 28, '', 13, C.muted, { ox: 1, weight: '600' }).setInteractive({ useHandCursor: true });
     const label = () => this.mute.setText(isMuted() ? '소리 끔' : '소리 켬');

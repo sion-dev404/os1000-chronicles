@@ -17,7 +17,7 @@ export class Timing extends BaseGame {
     this.bomb = T(this, W / 2, 210, '☢️', 96, '#fff', { depth: 6 });
     this.tweens.add({ targets: this.bomb, scale: 1.06, yoyo: true, repeat: -1, duration: 500, ease: 'Sine.easeInOut' });
     this.info = T(this, W / 2, 392, '', 14, C.muted, { depth: 6, weight: '600' });
-    T(this, W / 2, 420, '클릭 또는 스페이스', 12, C.dim, { depth: 6 });
+    T(this, W / 2, 420, '화면을 누르세요', 12, C.dim, { depth: 6 });
     this.newRound();
     this.input.on('pointerdown', () => this.stop());
     this.input.keyboard.on('keydown-SPACE', () => this.stop());

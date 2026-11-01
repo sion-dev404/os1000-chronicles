@@ -3,9 +3,9 @@
 // 줄 속성: t=자막, s=화면에 띄울 이모지, shake=화면 흔들림, flash=번쩍임 색, sfx=효과음
 export const CHAPTERS = [
   {
-    title: '사소한 균의 습격', game: 'Typing', accent: 0x6c8cff, mood: 'calm',
+    title: '사소한 균의 습격', game: 'Spell', accent: 0x6c8cff, mood: 'calm',
     rain: { chars: '01ㄱㅜㄴ', dir: 1 },
-    brief: '꼬인 오타를 그대로 입력해\n시스템을 복구하세요.', goal: '문장 5개 입력', time: 40,
+    brief: '흩어진 글자를 순서대로 눌러\n꼬인 오타를 바로잡으세요.', goal: '문장 5개 완성', time: 45,
     phrases: ['날씨 알림 웹앱', '오타를 고쳐라', '이렇게 쳐져', '키보드가 이상해', '바이러스 감지'],
     lines: [
       { t: '평화롭던 2026년의 어느 날. 사용자는 날씨 알림 웹앱을 만들고 있었다.', s: ['👨‍💻', '☁️'] },
@@ -46,7 +46,7 @@ export const CHAPTERS = [
   {
     title: '평양발 해킹과 방어벽', game: 'Dodge', accent: 0xff6b9a, mood: 'tense',
     rain: { chars: '★☭0', dir: 1 },
-    brief: '마우스 · 손가락 · 방향키로 방어벽을 움직여\n해킹 미사일을 피하세요.', goal: '20초 버티기', time: 20,
+    brief: '화면을 누르거나 끌어서 방어벽을 움직여\n해킹 미사일을 피하세요.', goal: '20초 버티기', time: 20,
     lines: [
       { t: '최고 사양 컴퓨터의 성능을 탐낸 평양의 김정은 위원장과 붉은별 해킹 부대가 시공간을 뚫고 쳐들어왔다.', s: ['🚀', '⭐', '🧑‍✈️'], shake: true, sfx: 'boom' },
       { t: '사용자는 가볍게 「무한대 퍼센트(%) 방어벽」을 전개했다. 해킹 서버들이 역으로 팝콘처럼 튀겨졌다.', s: ['🛡️', '♾️', '🍿'], flash: [80, 255, 160], sfx: 'win' },
@@ -55,7 +55,7 @@ export const CHAPTERS = [
   {
     title: '왕클로드와 안트로픽 폭파장치', game: 'Timing', accent: 0xa78bfa, mood: 'epic',
     rain: { chars: '</>{}', dir: 1 },
-    brief: '움직이는 바늘이 초록 구간에 올 때\n클릭하거나 스페이스를 누르세요.', goal: '폭파 코드 3회 성공', time: 0,
+    brief: '움직이는 바늘이 초록 구간에 올 때\n화면을 누르세요.', goal: '폭파 코드 3회 성공', time: 0,
     lines: [
       { t: '그 승리의 틈을 타 인공지능의 절대 군주 「왕클로드(King Claude)」가 등판했다.', s: ['👑', '🤖'], shake: true },
       { t: '치명적인 「살인 코드바이러스」로 시스템은 꼭두각시가 되어버렸다!', s: ['☠️', '💻'], flash: [150, 0, 255], sfx: 'glitch' },
