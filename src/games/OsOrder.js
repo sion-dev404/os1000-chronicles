@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { W, H, T, burst } from '../ui.js';
+import { W, C, T, css, floatText, burst } from '../ui.js';
 import { sfx } from '../audio.js';
 import { BaseGame } from './BaseGame.js';
 
@@ -11,6 +11,7 @@ const ORDER = [
   ['🍎', '맥츠맥'],
   ['💎', '윈도우 맥스프로'],
 ];
+const CW = 150, CH = 200, R = 16;
 
 export class OsOrder extends BaseGame {
   constructor() { super('OsOrder'); }
@@ -18,37 +19,50 @@ export class OsOrder extends BaseGame {
   setup() {
     this.goalN = ORDER.length;
     this.next = 0;
+
+    const line = this.add.graphics();
+    line.lineStyle(1, 0xffffff, 0.12).lineBetween(W / 2 - 300, 140, W / 2 + 300, 140);
+    T(this, W / 2 - 320, 140, '과거', 13, C.muted, { ox: 1, weight: '600' });
+    T(this, W / 2 + 320, 140, '미래', 13, C.muted, { ox: 0, weight: '600' });
+
     const idx = Phaser.Utils.Array.Shuffle([0, 1, 2, 3, 4]);
-    T(this, W / 2, 125, '과거 ──────────────▶ 미래', 22, '#9aa7ff');
     idx.forEach((k, pos) => {
-      const x = 105 + pos * 187;
-      const y = 300;
+      const x = W / 2 + (pos - 2) * (CW + 22);
+      const y = 310;
       const c = this.add.container(x, y);
-      const bg = this.add.rectangle(0, 0, 165, 230, 0x13203a).setStrokeStyle(4, 0x6aa8ff);
-      const e = T(this, 0, -35, ORDER[k][0], 70);
-      const n = T(this, 0, 55, ORDER[k][1], 22, '#ffffff', { bold: true, w: 150 });
+      const bg = this.add.graphics();
+      const draw = (state) => {
+        bg.clear();
+        bg.fillStyle(state === 'done' ? this.accent : C.surface, state === 'done' ? 0.14 : 1);
+        bg.fillRoundedRect(-CW / 2, -CH / 2, CW, CH, R);
+        bg.lineStyle(state === 'idle' ? 1 : 2, state === 'idle' ? 0xffffff : this.accent, state === 'idle' ? 0.08 : 1);
+        bg.strokeRoundedRect(-CW / 2, -CH / 2, CW, CH, R);
+      };
+      draw('idle');
+      const e = T(this, 0, -26, ORDER[k][0], 60);
+      const n = T(this, 0, 56, ORDER[k][1], 16, C.text, { weight: '700', w: CW - 20 });
       c.add([bg, e, n]);
-      c.setSize(165, 230).setInteractive({ useHandCursor: true });
-      c.on('pointerover', () => !c.done && this.tweens.add({ targets: c, y: y - 8, duration: 100 }));
-      c.on('pointerout', () => !c.done && this.tweens.add({ targets: c, y, duration: 100 }));
+      c.setSize(CW, CH).setInteractive({ useHandCursor: true });
+      c.on('pointerover', () => { if (!c.done) { draw('hover'); this.tweens.add({ targets: c, y: y - 6, duration: 120 }); } });
+      c.on('pointerout', () => { if (!c.done) { draw('idle'); this.tweens.add({ targets: c, y, duration: 120 }); } });
       c.on('pointerdown', () => {
         if (c.done || this.ended || !this.ready) return;
         if (k === this.next) {
           c.done = true;
-          bg.setFillStyle(0x145a2a).setStrokeStyle(4, 0x38ff7a);
-          const badge = T(this, -60, -95, String(this.next + 1), 28, '#000', { bold: true });
-          const b = this.add.circle(-60, -95, 18, 0xffe14a);
-          c.add([b, badge]);
-          burst(this, x, y, ['✦'], 10, '#38ff7a', 90);
+          draw('done');
+          c.y = y;
+          const b = this.add.circle(-CW / 2 + 22, -CH / 2 + 22, 12, this.accent);
+          const bt = T(this, -CW / 2 + 22, -CH / 2 + 22, String(this.next + 1), 13, css(C.bg), { weight: '800' });
+          c.add([b, bt]);
+          burst(this, x, y, this.accent, 12, 90);
           this.next++;
           this.addScore();
         } else {
           sfx.bad();
           this.timeLeft = Math.max(0, this.timeLeft - 3);
-          this.cameras.main.shake(180, 0.008);
-          this.tweens.add({ targets: c, x: x + 10, yoyo: true, repeat: 3, duration: 40, onComplete: () => (c.x = x) });
-          const pen = T(this, x, y - 140, '-3초', 28, '#ff6a6a', { bold: true, depth: 80 });
-          this.tweens.add({ targets: pen, y: pen.y - 40, alpha: 0, duration: 700, onComplete: () => pen.destroy() });
+          this.cameras.main.shake(160, 0.005);
+          this.tweens.add({ targets: c, x: x + 8, yoyo: true, repeat: 3, duration: 40, onComplete: () => (c.x = x) });
+          floatText(this, x, y - CH / 2 - 16, '-3초', css(C.danger));
         }
       });
     });

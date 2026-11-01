@@ -1,37 +1,40 @@
 import Phaser from 'phaser';
-import { W, H, T, gradientBg, button, Rain, burst, save } from '../ui.js';
+import { W, H, C, T, css, backdrop, button, Rain, burst, save } from '../ui.js';
 import { sfx, bgm } from '../audio.js';
+
+const GOLD = 0xf5c84c;
+const SPARKS = [0xf5c84c, 0x6c8cff, 0xa78bfa, 0x4fd1c5];
 
 export class Ending extends Phaser.Scene {
   constructor() { super('Ending'); }
 
   create() {
     save.max = 99;
-    gradientBg(this, 0x000000, 0x1a0a3a);
-    this.rain = new Rain(this, { chars: '✦✧', color: '#ffe14a', dir: -1, count: 70, alpha: 0.7, size: 26 });
+    backdrop(this, GOLD);
+    this.rain = new Rain(this, { chars: '·✦', color: css(GOLD), dir: -1, count: 30, alpha: 0.25 });
     bgm('epic');
     sfx.fanfare();
-    this.cameras.main.fadeIn(800, 255, 255, 255);
+    this.cameras.main.fadeIn(900, 255, 255, 255);
 
-    const os = T(this, W / 2, 190, 'OS 1000', 150, '#ffffff', { bold: true, stroke: '#ffe14a', st: 10 }).setScale(0);
-    this.tweens.add({ targets: os, scale: 1, duration: 1200, ease: 'Elastic.easeOut' });
-    this.tweens.add({ targets: os, angle: 2, yoyo: true, repeat: -1, duration: 1500, ease: 'Sine.easeInOut', delay: 1300 });
+    T(this, W / 2, 128, 'EPILOGUE', 12, css(GOLD), { weight: '700', ls2: 4 });
+    const os = T(this, W / 2, 200, 'OS 1000', 112, C.text, { weight: '800' }).setAlpha(0).setScale(0.9);
+    this.tweens.add({ targets: os, alpha: 1, scale: 1, duration: 1200, ease: 'Cubic.easeOut' });
 
-    T(this, W / 2, 300, '초차원의 절대 전지전능 운영체제가 깨어났다', 28, '#ffe14a', { bold: true });
-    T(this, W / 2, 345, 'THE END', 40, '#ffffff', { bold: true });
-    T(this, W / 2, 392, '날씨 앱은 사라졌지만, 당신의 뇌절은 영원하다 ☁️', 20, '#b9c2ff');
+    T(this, W / 2, 284, '초차원의 절대 전지전능 운영체제가 깨어났다', 20, css(GOLD), { weight: '700' });
+    T(this, W / 2, 318, '날씨 앱은 사라졌지만, 당신의 뇌절은 영원하다', 15, C.muted);
+    T(this, W / 2, 360, 'THE END', 12, C.dim, { weight: '700', ls2: 6 });
 
-    button(this, W / 2 - 150, 460, 250, 58, '↻ 처음부터', () => this.go('Cutscene', { ch: 0 }), 0x2a6cff);
-    button(this, W / 2 + 150, 460, 250, 58, '타이틀로', () => this.go('Title'), 0x7a3aff);
+    button(this, W / 2 - 104, 436, 190, 48, '처음부터', () => this.go('Cutscene', { ch: 0 }), { accent: GOLD });
+    button(this, W / 2 + 104, 436, 190, 48, '타이틀로', () => this.go('Title'), { variant: 'ghost' });
 
     this.time.addEvent({
-      delay: 450, loop: true,
-      callback: () => burst(this, 120 + Math.random() * (W - 240), 60 + Math.random() * 180, ['✦', '★', '✧', '🎆'], 16, ['#ffe14a', '#ff6ad5', '#6ad7ff', '#8aff6a'][Math.floor(Math.random() * 4)], 110, 28),
+      delay: 1100, loop: true,
+      callback: () => burst(this, 140 + Math.random() * (W - 280), 70 + Math.random() * 120, Phaser.Utils.Array.GetRandom(SPARKS), 14, 80, 3),
     });
   }
 
   go(key, data) {
-    this.cameras.main.fadeOut(350, 0, 0, 0);
+    this.cameras.main.fadeOut(350, 11, 13, 20);
     this.cameras.main.once('camerafadeoutcomplete', () => this.scene.start(key, data));
   }
 

@@ -1,4 +1,4 @@
-import { W, H, T } from '../ui.js';
+import { W, C, T, css, burst } from '../ui.js';
 import { sfx } from '../audio.js';
 import { BaseGame } from './BaseGame.js';
 
@@ -6,36 +6,51 @@ import { BaseGame } from './BaseGame.js';
 export class Typing extends BaseGame {
   constructor() { super('Typing'); }
 
+  create() {
+    super.create();
+    this.events.once('shutdown', () => this.cleanup());
+  }
+
   setup() {
     this.phrases = this.cfg.phrases;
     this.goalN = this.phrases.length;
     this.idx = 0;
     this.box = document.getElementById('typebox');
-    this.target = T(this, W / 2, 250, '', 64, '#ffffff', { bold: true, stroke: '#000', st: 6, depth: 5 });
-    this.mirror = T(this, W / 2, 330, '', 34, '#9dffb0', { depth: 5 });
-    this.hint = T(this, W / 2, 150, '', 18, '#8890c0', { depth: 5 });
+    this.box.style.setProperty('--accent', css(this.accent));
+    this.step = T(this, W / 2, 170, '', 13, C.muted, { weight: '600' });
+    this.target = T(this, W / 2, 240, '', 52, C.text, { weight: '800' });
     this.onInput = () => {
       const v = this.box.value;
       const want = this.phrases[this.idx];
-      this.mirror.setText(v).setColor(want.startsWith(v) ? '#9dffb0' : '#ff6a6a');
+      this.box.style.color = want.startsWith(v) ? C.text : css(C.danger);
       sfx.type();
-      if (v.trim() === want) {
-        this.idx++;
-        this.box.value = '';
-        this.mirror.setText('');
-        this.target.setScale(1.3);
-        this.tweens.add({ targets: this.target, scale: 1, duration: 200 });
-        this.score = this.idx;
-        sfx.good();
-        this.refreshHud();
-        if (this.idx >= this.goalN) this.win();
-        else this.showPhrase();
-      }
+      if (v.trim() !== want) return;
+      this.idx++;
+      this.box.value = '';
+      this.box.style.color = C.text;
+      burst(this, W / 2, 240, this.accent, 16, 160, 4);
+      this.score = this.idx;
+      sfx.good();
+      this.refreshHud();
+      if (this.idx >= this.goalN) this.win();
+      else this.showPhrase();
     };
     this.box.addEventListener('input', this.onInput);
   }
 
+  // 캔버스 좌표 (W/2, 390)에 360x52 크기로 입력창을 맞춘다
+  place() {
+    const r = this.game.canvas.getBoundingClientRect();
+    const k = r.width / W;
+    Object.assign(this.box.style, {
+      left: `${r.left + r.width / 2}px`, top: `${r.top + 390 * k}px`,
+      width: `${360 * k}px`, height: `${52 * k}px`, fontSize: `${20 * k}px`,
+    });
+  }
+
   onStart() {
+    this.place();
+    this.scale.on('resize', this.place, this);
     this.box.style.display = 'block';
     this.box.value = '';
     this.box.focus();
@@ -44,18 +59,17 @@ export class Typing extends BaseGame {
   }
 
   showPhrase() {
-    this.target.setText(this.phrases[this.idx]);
-    this.hint.setText(`${this.idx + 1} / ${this.goalN}  ·  위 문장을 그대로 입력하세요`);
+    this.step.setText(`${this.idx + 1} / ${this.goalN}`);
+    this.target.setText(this.phrases[this.idx]).setAlpha(0);
+    this.tweens.add({ targets: this.target, alpha: 1, duration: 250 });
   }
 
   tick() {}
 
   cleanup() {
+    this.scale.off('resize', this.place, this);
     this.box.removeEventListener('input', this.onInput);
     this.box.style.display = 'none';
     this.box.blur();
   }
-
-  shutdown() { this.cleanup(); }
-  create() { super.create(); this.events.once('shutdown', () => this.cleanup()); }
 }

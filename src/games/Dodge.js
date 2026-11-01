@@ -1,6 +1,5 @@
 import Phaser from 'phaser';
-import { W, H, T, burst } from '../ui.js';
-import { sfx } from '../audio.js';
+import { W, H, C, T, burst } from '../ui.js';
 import { BaseGame } from './BaseGame.js';
 
 // 5장: 방어벽 이동으로 해킹 미사일 회피 (20초 생존)
@@ -10,8 +9,8 @@ export class Dodge extends BaseGame {
   setup() {
     this.goalN = this.cfg.time;
     this.px = W / 2;
-    this.player = T(this, this.px, H - 60, '🛡️', 64, '#fff', { depth: 6 });
-    this.aura = this.add.circle(this.px, H - 60, 44, 0x38ff7a, 0.18).setDepth(5);
+    this.aura = this.add.circle(this.px, H - 60, 40, this.accent, 0.12).setStrokeStyle(1, this.accent, 0.5).setDepth(5);
+    this.player = T(this, this.px, H - 60, '🛡️', 52, '#fff', { depth: 6 });
     this.enemies = [];
     this.spawnT = 0;
     this.invul = 0;
@@ -37,7 +36,7 @@ export class Dodge extends BaseGame {
       this.spawnT = Math.max(0.16, 0.5 / diff);
       const x = Phaser.Math.Between(30, W - 30);
       const kind = Math.random() < 0.7 ? '🚀' : '⭐';
-      const t = T(this, x, 90, kind, 40, '#fff', { depth: 4 });
+      const t = T(this, x, 90, kind, 34, '#fff', { depth: 4 });
       t.setAngle(kind === '🚀' ? 135 : 0);
       this.enemies.push({ t, vy: 200 * diff + Math.random() * 120, vx: Phaser.Math.Between(-60, 60) });
     }
@@ -45,8 +44,8 @@ export class Dodge extends BaseGame {
       e.t.y += e.vy * dt;
       e.t.x += e.vx * dt;
       if (e.t.y > H + 30) { e.t.destroy(); this.enemies = this.enemies.filter((i) => i !== e); continue; }
-      if (this.invul <= 0 && Math.abs(e.t.x - this.player.x) < 38 && Math.abs(e.t.y - this.player.y) < 38) {
-        burst(this, e.t.x, e.t.y, ['💥', '✦'], 8, '#ff8a3a', 80);
+      if (this.invul <= 0 && Math.abs(e.t.x - this.player.x) < 34 && Math.abs(e.t.y - this.player.y) < 34) {
+        burst(this, e.t.x, e.t.y, C.danger, 10, 70);
         e.t.destroy();
         this.enemies = this.enemies.filter((i) => i !== e);
         this.invul = 1;

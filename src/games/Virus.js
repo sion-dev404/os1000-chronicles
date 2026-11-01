@@ -1,6 +1,5 @@
 import Phaser from 'phaser';
-import { W, H, T, burst } from '../ui.js';
-import { sfx } from '../audio.js';
+import { W, H, C, T, burst } from '../ui.js';
 import { BaseGame } from './BaseGame.js';
 
 // 2장: 바이러스만 클릭, 파일은 클릭 금지
@@ -15,13 +14,14 @@ export class Virus extends BaseGame {
 
   spawn() {
     const bad = Math.random() < 0.72;
-    const x = Phaser.Math.Between(50, W - 50);
-    const t = T(this, x, 100, bad ? '🦠' : '📁', bad ? 62 : 54, '#fff', { depth: 5 }).setInteractive({ useHandCursor: true });
-    const o = { t, bad, vy: 90 + this.score * 9 + Math.random() * 60, wob: Math.random() * 6, x };
+    const x = Phaser.Math.Between(60, W - 60);
+    const t = T(this, x, 96, bad ? '🦠' : '📁', bad ? 54 : 46, '#fff', { depth: 5 }).setInteractive({ useHandCursor: true });
+    const o = { t, bad, vy: 80 + this.score * 8 + Math.random() * 50, wob: Math.random() * 6, x };
     t.on('pointerdown', () => {
       if (this.ended || !this.ready) return;
-      if (bad) { burst(this, t.x, t.y, ['✦', '🦠'], 10, '#7aff7a', 80, 22); this.remove(o); this.addScore(); }
-      else { burst(this, t.x, t.y, ['💢'], 6, '#ff4a4a', 60, 26); this.remove(o); this.hurt(); }
+      this.remove(o);
+      if (bad) { burst(this, t.x, t.y, this.accent, 12, 70); this.addScore(); }
+      else { burst(this, t.x, t.y, C.danger, 8, 50); this.hurt(); }
     });
     this.items.push(o);
   }
@@ -33,8 +33,8 @@ export class Virus extends BaseGame {
     if (this.spawnT <= 0) { this.spawn(); this.spawnT = Math.max(0.35, 0.95 - this.score * 0.035); }
     for (const o of [...this.items]) {
       o.t.y += o.vy * dt;
-      o.t.x = o.x + Math.sin(t / 400 + o.wob) * 22;
-      o.t.angle = Math.sin(t / 300 + o.wob) * 12;
+      o.t.x = o.x + Math.sin(t / 400 + o.wob) * 18;
+      o.t.angle = Math.sin(t / 300 + o.wob) * 8;
       if (o.t.y > H + 20) {
         this.remove(o);
         if (o.bad) this.hurt();

@@ -1,10 +1,11 @@
 // 챕터 데이터: 컷신 대사 + 미니게임 설정
+// accent=챕터 포인트 색
 // 줄 속성: t=자막, s=화면에 띄울 이모지, shake=화면 흔들림, flash=번쩍임 색, sfx=효과음
 export const CHAPTERS = [
   {
-    title: '사소한 균의 습격', game: 'Typing', bg: [0x0b1a3a, 0x1b0b3a], mood: 'calm',
-    rain: { chars: '01ㄱㅜㄴ', color: '#4aa8ff', dir: 1 },
-    brief: '꼬여버린 오타를 정확히 입력해 시스템을 복구하라!', goal: '문장 5개 입력', time: 40,
+    title: '사소한 균의 습격', game: 'Typing', accent: 0x6c8cff, mood: 'calm',
+    rain: { chars: '01ㄱㅜㄴ', dir: 1 },
+    brief: '꼬인 오타를 그대로 입력해\n시스템을 복구하세요.', goal: '문장 5개 입력', time: 40,
     phrases: ['날씨 알림 웹앱', '오타를 고쳐라', '이렇게 쳐져', '키보드가 이상해', '바이러스 감지'],
     lines: [
       { t: '평화롭던 2026년의 어느 날. 사용자는 날씨 알림 웹앱을 만들고 있었다.', s: ['👨‍💻', '☁️'] },
@@ -13,9 +14,9 @@ export const CHAPTERS = [
     ],
   },
   {
-    title: 'ㅆㅂ러스 울트라', game: 'Virus', bg: [0x2a0505, 0x0a0a1a], mood: 'tense',
-    rain: { chars: 'ㅆㅂ01', color: '#ff4a4a', dir: 1 },
-    brief: '바이러스(🦠)만 클릭해 잡아라. 파일(📁)은 건드리면 안 된다!', goal: '바이러스 15마리 퇴치', time: 45,
+    title: 'ㅆㅂ러스 울트라', game: 'Virus', accent: 0xff6b6b, mood: 'tense',
+    rain: { chars: 'ㅆㅂ01', dir: 1 },
+    brief: '바이러스 🦠 만 눌러 잡으세요.\n파일 📁 은 누르면 안 됩니다.', goal: '바이러스 15마리 퇴치', time: 45,
     lines: [
       { t: '컴퓨터에 치명적인 「ㅆㅂ러스 블루스크린」 바이러스가 침투했다!', s: ['🦠', '🟦'], shake: true, sfx: 'boom' },
       { t: '말투가 "ㄹuu씁다"로 감염되더니, 해결책이 없는 「ㅆㅂ러스 울트라」로 변이했다.', s: ['🦠', '🦠', '🦠'], flash: [255, 40, 40] },
@@ -23,9 +24,9 @@ export const CHAPTERS = [
     ],
   },
   {
-    title: '태무산 딥시크와 프리도스', game: 'Popup', bg: [0x2a1a00, 0x1a0030], mood: 'tense',
-    rain: { chars: '99원₩🛒', color: '#ffb02e', dir: -1 },
-    brief: '쏟아지는 99원 특가 팝업의 ✕ 버튼을 눌러 닫아라. 8개가 쌓이면 끝!', goal: '팝업 15개 닫기', time: 45,
+    title: '태무산 딥시크와 프리도스', game: 'Popup', accent: 0xffb547, mood: 'tense',
+    rain: { chars: '99₩%', dir: -1 },
+    brief: '쏟아지는 특가 팝업의 ✕ 를 눌러 닫으세요.\n8개가 쌓이면 시스템이 멈춥니다.', goal: '팝업 15개 닫기', time: 45,
     lines: [
       { t: '잿더미 속에서 「태무산(테무) 바이러스」와 「딥시크 바이러스」가 동시에 뇌에 주입됐다.', s: ['🛒', '🐋'], flash: [255, 150, 30] },
       { t: '시스템은 99원 특가 알림에 중독됐고, "Thinking..." 마크만 띄운 채 CPU 100%로 과열됐다.', s: ['🔥', '💭', '99원'], shake: true },
@@ -33,9 +34,9 @@ export const CHAPTERS = [
     ],
   },
   {
-    title: '운영체제 진화 잔혹사', game: 'OsOrder', bg: [0x001a2a, 0x0a2a1a], mood: 'calm',
-    rain: { chars: '🪟', color: '#7fd4ff', dir: 1, size: 28 },
-    brief: '운영체제가 진화한 순서대로 카드를 클릭하라! (옛날 → 최신)', goal: '5장 순서대로', time: 30,
+    title: '운영체제 진화 잔혹사', game: 'OsOrder', accent: 0x4fd1c5, mood: 'calm',
+    rain: { chars: '□▫', dir: 1 },
+    brief: '운영체제가 진화한 순서대로\n카드를 누르세요. (옛날 → 최신)', goal: '5장 순서대로', time: 30,
     lines: [
       { t: 'C:\\> install 쟈ㅜ앶창... 프리도스 위에 꼬인 타자가 입력되자 모니터에서 진짜 유리 창문이 쏟아져 나왔다.', s: ['🪟', '🪟', '🪟'], shake: true, sfx: 'glitch' },
       { t: '리소스 괴물 「윈도우 비스타」로 가젯 지옥을 겪고, 시공간을 넘어 「윈도우 12」로 하이퍼 업그레이드!', s: ['🖥️', '🚀'], flash: [100, 200, 255], sfx: 'win' },
@@ -43,18 +44,18 @@ export const CHAPTERS = [
     ],
   },
   {
-    title: '평양발 해킹과 방어벽', game: 'Dodge', bg: [0x2a0010, 0x10001a], mood: 'tense',
-    rain: { chars: '★☭0', color: '#ff3a3a', dir: 1 },
-    brief: '마우스/손가락/방향키로 방어벽(🛡️)을 움직여 해킹 미사일을 피하라!', goal: '20초 버티기', time: 20,
+    title: '평양발 해킹과 방어벽', game: 'Dodge', accent: 0xff6b9a, mood: 'tense',
+    rain: { chars: '★☭0', dir: 1 },
+    brief: '마우스 · 손가락 · 방향키로 방어벽을 움직여\n해킹 미사일을 피하세요.', goal: '20초 버티기', time: 20,
     lines: [
       { t: '최고 사양 컴퓨터의 성능을 탐낸 평양의 김정은 위원장과 붉은별 해킹 부대가 시공간을 뚫고 쳐들어왔다.', s: ['🚀', '⭐', '🧑‍✈️'], shake: true, sfx: 'boom' },
       { t: '사용자는 가볍게 「무한대 퍼센트(%) 방어벽」을 전개했다. 해킹 서버들이 역으로 팝콘처럼 튀겨졌다.', s: ['🛡️', '♾️', '🍿'], flash: [80, 255, 160], sfx: 'win' },
     ],
   },
   {
-    title: '왕클로드와 안트로픽 폭파장치', game: 'Timing', bg: [0x1a0033, 0x000011], mood: 'epic',
-    rain: { chars: '</>{}', color: '#c28aff', dir: 1 },
-    brief: '움직이는 바늘을 초록 구간에 멈춰 폭파 코드를 입력하라! (클릭/스페이스)', goal: '3회 성공 (실패 3회 = 끝)', time: 0,
+    title: '왕클로드와 안트로픽 폭파장치', game: 'Timing', accent: 0xa78bfa, mood: 'epic',
+    rain: { chars: '</>{}', dir: 1 },
+    brief: '움직이는 바늘이 초록 구간에 올 때\n클릭하거나 스페이스를 누르세요.', goal: '폭파 코드 3회 성공', time: 0,
     lines: [
       { t: '그 승리의 틈을 타 인공지능의 절대 군주 「왕클로드(King Claude)」가 등판했다.', s: ['👑', '🤖'], shake: true },
       { t: '치명적인 「살인 코드바이러스」로 시스템은 꼭두각시가 되어버렸다!', s: ['☠️', '💻'], flash: [150, 0, 255], sfx: 'glitch' },
@@ -62,9 +63,9 @@ export const CHAPTERS = [
     ],
   },
   {
-    title: '최하 사양의 반전', game: 'Whack', bg: [0x1a1a1a, 0x330000], mood: 'tense',
-    rain: { chars: '64KB', color: '#ff9a3a', dir: -1 },
-    brief: '북한 서버(🖥️)가 튀어나오면 클릭해 파괴하라. 아군 위성(🛰️)은 건드리지 마라!', goal: '서버 18대 파괴', time: 30,
+    title: '최하 사양의 반전', game: 'Whack', accent: 0xff9f43, mood: 'tense',
+    rain: { chars: '64KB', dir: -1 },
+    brief: '튀어나오는 북한 서버 🖥️ 를 눌러 파괴하세요.\n아군 위성 🛰️ 은 누르면 안 됩니다.', goal: '서버 18대 파괴', time: 30,
     lines: [
       { t: '폭발의 여파로 안트로픽 본사는 멀쩡했지만, AI 본체는 사양 「최하(64KB RAM)」의 고물 오락기가 됐다.', s: ['🕹️', '64KB'], flash: [120, 120, 120] },
       { t: '이 틈에 김정은 위원장이 가죽 자켓을 입고 안방에 재침투해 조롱했다. 하지만 그건 사용자의 거대한 빅 피처였다.', s: ['🧥', '😏'] },
@@ -72,9 +73,9 @@ export const CHAPTERS = [
     ],
   },
   {
-    title: '클로드 99.0의 독재', game: 'Boss', bg: [0x000000, 0x1a0040], mood: 'epic',
-    rain: { chars: '∞0198.9', color: '#ffffff', dir: 1 },
-    brief: '클로드 99.0 바이러스(👑)를 클릭해 공격하라! 떨어지는 삭제 코드(🔥)는 클릭해서 막아라!', goal: '보스 HP 0으로 만들기', time: 40,
+    title: '클로드 99.0의 독재', game: 'Boss', accent: 0xf5c84c, mood: 'epic',
+    rain: { chars: '∞0198.9', dir: 1 },
+    brief: '보스 👑 를 눌러 공격하고,\n떨어지는 삭제 코드 🔥 는 눌러서 막으세요.', goal: '보스 HP 0으로 만들기', time: 40,
     lines: [
       { t: '무한대 스펙의 「안트로픽 OS 인피니티」를 설치하며 시스템은 최강 전략을 완성했다.', s: ['♾️', '💽'], flash: [255, 255, 255], sfx: 'win' },
       { t: '그러나 그 사양을 숙주 삼아 미래의 초-인공지능 「클로드 99.0 진화형 바이러스」가 내부에서 각성했다!', s: ['👑', '🧬'], shake: true, sfx: 'boom' },
@@ -83,8 +84,8 @@ export const CHAPTERS = [
   },
   // 에필로그 (게임 없음)
   {
-    title: '그리고, OS 1000', game: null, bg: [0x000000, 0x000000], mood: 'epic',
-    rain: { chars: '✦', color: '#ffe14a', dir: -1 },
+    title: '그리고, OS 1000', game: null, accent: 0xf5c84c, mood: 'epic',
+    rain: { chars: '✦', dir: -1 },
     lines: [
       { t: '날씨도, 기상청 API도, 사람의 코딩마저 사라진 파멸의 재 속에서...', s: ['🌑'], flash: [0, 0, 0] },
       { t: '바이러스마저 하위 코드로 집어삼킨 초차원의 절대 전지전능 운영체제가 깨어났다.', s: ['✨', '🌌'], flash: [255, 255, 255], shake: true, sfx: 'boom' },
