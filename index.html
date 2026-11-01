@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<meta name="theme-color" content="#05060f" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ctext y=%27.9em%27 font-size=%2790%27%3E%F0%9F%91%91%3C/text%3E%3C/svg%3E" />
+<title>OS 1000 대서사시</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #05060f; overflow: hidden; touch-action: none; }
+  #app { width: 100vw; height: 100vh; }
+  #typebox {
+    position: fixed; left: 50%; bottom: 7vh; transform: translateX(-50%);
+    width: min(560px, 86vw); padding: 12px 16px; font-size: 26px; text-align: center;
+    background: #0b1020; color: #9dffb0; border: 2px solid #38ff7a; border-radius: 10px; outline: none;
+    font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif; display: none; z-index: 5;
+  }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<input id="typebox" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" />
+<script type="module" src="/src/main.js"></script>
+</body>
+</html>
