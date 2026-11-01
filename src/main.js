@@ -5,6 +5,7 @@ import { Title } from './scenes/Title.js';
 import { Cutscene } from './scenes/Cutscene.js';
 import { Choice } from './scenes/Choice.js';
 import { Ending } from './scenes/Ending.js';
+import { Duel } from './scenes/Duel.js';
 import { Spell } from './games/Spell.js';
 import { Virus } from './games/Virus.js';
 import { Popup } from './games/Popup.js';
@@ -29,6 +30,6 @@ fontsReady.then(() => {
     backgroundColor: '#0b0d14',
     scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH },
     input: { activePointers: 3 },
-    scene: [Title, Cutscene, Choice, Spell, Virus, Popup, OsOrder, Dodge, Timing, Whack, Boss, Ending],
+    scene: [Title, Cutscene, Choice, Spell, Virus, Popup, OsOrder, Dodge, Timing, Whack, Boss, Ending, Duel],
   });
 });

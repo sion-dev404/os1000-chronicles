@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { W, H, C, T, css, hd, button, burst, save } from '../ui.js';
 import { sfx, bgm } from '../audio.js';
 import { ENDING } from '../story.js';
+import { CLAUDE, REBIRTH_ENDING } from '../arc.js';
 import { Sky } from '../sky.js';
 import { getWeather } from '../weather.js';
 
@@ -9,9 +10,12 @@ const GOLD = 0xf5c84c;
 const SPARKS = [0xf5c84c, 0x6c8cff, 0xa78bfa, 0x4fd1c5];
 const SPEED = 34;
 
-// 엔딩: 실제 날씨로 그린 하늘 위로 결말이 크레딧처럼 올라가고, 끝나면 OS 1000 로고
+// 엔딩: 실제 날씨로 그린 하늘 위로 결말이 크레딧처럼 올라가고, 끝나면 로고
+// mode 'os' = OS 1000 엔딩(클로드 재탄생 버튼), 'rebirth' = 클로드 1000 최종 엔딩
 export class Ending extends Phaser.Scene {
   constructor() { super('Ending'); }
+
+  init(d) { this.mode = d?.mode || 'os'; }
 
   create() {
     save.max = 99;
@@ -46,7 +50,7 @@ export class Ending extends Phaser.Scene {
   buildRoll() {
     this.roll = this.add.container(W / 2, H + 30).setDepth(10);
     let y = 0;
-    for (const l of ENDING) {
+    for (const l of this.mode === 'rebirth' ? REBIRTH_ENDING : ENDING) {
       if (l.st === 'gap') { y += 22; continue; }
       let t;
       if (l.st === 'code') t = T(this, 0, y, l.t, 17, css(GOLD), { weight: '700' });
@@ -89,10 +93,11 @@ export class Ending extends Phaser.Scene {
   showFinal() {
     sfx.fanfare();
     const items = [];
-    items.push(T(this, W / 2, 134, 'THE END', 12, css(GOLD), { weight: '700', ls2: 6 }));
-    const os = T(this, W / 2, 202, 'OS 1000', 112, '#ffffff', { weight: '800' });
+    const rebirth = this.mode === 'rebirth';
+    items.push(T(this, W / 2, 134, rebirth ? 'TRUE END' : 'THE END', 12, css(rebirth ? CLAUDE : GOLD), { weight: '700', ls2: 6 }));
+    const os = T(this, W / 2, 202, rebirth ? 'Claude 1000' : 'OS 1000', rebirth ? 96 : 112, '#ffffff', { weight: '800' });
     items.push(os);
-    items.push(T(this, W / 2, 284, '초차원의 운영체제가 날씨를 다시 썼다', 20, css(GOLD), { weight: '700' }));
+    items.push(T(this, W / 2, 284, rebirth ? '당신은 그냥 컴퓨터부터 클로드까지 살렸습니다.' : '초차원의 운영체제가 날씨를 다시 썼다', rebirth ? 24 : 20, css(GOLD), { weight: '800' }));
     this.finalSky = T(this, W / 2, 320, this.skyText(this.weather), 15, '#e6e9f0', { weight: '600' });
     items.push(this.finalSky);
     items.forEach((t, i) => {
@@ -103,8 +108,14 @@ export class Ending extends Phaser.Scene {
     os.setScale(0.92);
     this.tweens.add({ targets: os, scale: 1, duration: 1200, ease: 'Cubic.easeOut' });
 
-    button(this, W / 2 - 104, 410, 190, 48, '처음부터', () => this.go('Cutscene', { ch: 0 }), { accent: GOLD });
-    button(this, W / 2 + 104, 410, 190, 48, '타이틀로', () => this.go('Title'), { variant: 'ghost' });
+    if (rebirth) {
+      button(this, W / 2 - 104, 410, 190, 48, '처음부터', () => this.go('Cutscene', { ch: 0 }), { accent: GOLD });
+      button(this, W / 2 + 104, 410, 190, 48, '타이틀로', () => this.go('Title'), { variant: 'ghost' });
+    } else {
+      button(this, W / 2, 396, 320, 52, '✻  클로드 1.0으로 재탄생', () => this.go('Duel', { stage: 0 }), { accent: CLAUDE, size: 18 });
+      button(this, W / 2 - 88, 462, 160, 42, '처음부터', () => this.go('Cutscene', { ch: 0 }), { variant: 'ghost', size: 15 });
+      button(this, W / 2 + 88, 462, 160, 42, '타이틀로', () => this.go('Title'), { variant: 'ghost', size: 15 });
+    }
 
     this.time.addEvent({
       delay: 1200, loop: true,

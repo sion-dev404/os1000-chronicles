@@ -156,4 +156,6 @@ export function floatText(scene, x, y, str, color = C.text) {
 export const save = {
   get max() { try { return Number(localStorage.getItem('os1000.max') || 0); } catch { return 0; } },
   set max(v) { try { localStorage.setItem('os1000.max', String(v)); } catch { /* 무시 */ } },
+  get rebirth() { try { return Number(localStorage.getItem('os1000.rebirth') || 0); } catch { return 0; } },
+  set rebirth(v) { try { localStorage.setItem('os1000.rebirth', String(v)); } catch { /* 무시 */ } },
 };
