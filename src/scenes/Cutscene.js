@@ -15,6 +15,9 @@ export class Cutscene extends Phaser.Scene {
   create() {
     const cfg = (this.cfg = CHAPTERS[this.ch]);
     this.accent = cfg.accent;
+    // 씬 객체는 재사용되므로 이전 방문 상태를 초기화한다
+    this.leaving = false;
+    this.typing = false;
     hd(this);
     backdrop(this, this.accent);
     this.rain = new Rain(this, { ...cfg.rain, color: css(this.accent), count: 16, alpha: 0.1 });
@@ -24,9 +27,36 @@ export class Cutscene extends Phaser.Scene {
 
     this.drawArt();
     this.drawText();
+    this.weatherCheck = this.checkWeatherData();
+    this.weatherCheck?.then((available) => {
+      if (!available) this.forceOs1000();
+    });
 
     this.input.on('pointerdown', () => { if (this.typing) this.finishTyping(); });
     sfx.glitch();
+  }
+
+  checkWeatherData() {
+    if (this.ch !== CHAPTERS.length - 2) return null;
+
+    return Promise.resolve()
+      .then(() => fetch(`${import.meta.env.BASE_URL}weather.json`))
+      .then((response) => {
+        if (!response.ok) throw new Error(`weather.json request failed: ${response.status}`);
+        return response.json();
+      })
+      .then(() => true)
+      .catch(() => false);
+  }
+
+  forceOs1000() {
+    if (this.leaving) return;
+    this.leaving = true;
+    this.typer?.remove();
+    this.cameras.main.fadeOut(400, 0, 0, 0);
+    this.cameras.main.once('camerafadeoutcomplete', () => {
+      this.scene.start('Cutscene', { ch: CHAPTERS.length - 1 });
+    });
   }
 
   drawArt() {
@@ -112,6 +142,19 @@ export class Cutscene extends Phaser.Scene {
   }
 
   leave() {
+    if (this.leaving) return;
+    if (this.weatherCheck) {
+      this.weatherCheck.then((available) => {
+        if (this.leaving) return;
+        if (available) this.continue();
+        else this.forceOs1000();
+      });
+      return;
+    }
+    this.continue();
+  }
+
+  continue() {
     if (this.leaving) return;
     this.leaving = true;
     this.typer?.remove();
