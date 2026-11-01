@@ -1,21 +1,25 @@
 import Phaser from 'phaser';
-import { W, H, C, T, css, backdrop, panel, button, chip, save } from '../ui.js';
+import { W, H, C, T, css, hd, backdrop, panel, button, chip, save } from '../ui.js';
 import { sfx, bgm } from '../audio.js';
 import { CHAPTERS } from '../story.js';
 
 // 모든 미니게임 공통: 배경, HUD(진행바/챕터/목숨/타이머), 미션 카드, 승패 카드
+// mod: 선택지 보너스 ('life' 목숨 +1, 'time' 시간 +10초 / 버티기 게임은 -5초)
 export class BaseGame extends Phaser.Scene {
-  init(d) { this.ch = d.ch; }
+  init(d) { this.ch = d.ch; this.mod = d.mod || null; }
 
   create() {
     const cfg = (this.cfg = CHAPTERS[this.ch]);
     this.accent = cfg.accent;
+    hd(this);
     this.ended = false;
     this.ready = false;
     this.lives = 3;
+    this.maxLives = 3;
     this.score = 0;
     this.goalN = 1;
     this.timeLeft = cfg.time || 0;
+    this.applyMod();
 
     backdrop(this, this.accent);
     this.buildHud();
@@ -23,6 +27,15 @@ export class BaseGame extends Phaser.Scene {
     this.setup();
     this.refreshHud();
     this.showBrief();
+  }
+
+  applyMod() {
+    if (this.mod === 'life' || (this.mod === 'time' && !this.cfg.time)) { this.lives = this.maxLives = 4; this.modLabel = '보너스  목숨 +1'; }
+    else if (this.mod === 'time') {
+      const survive = this.constructor.SURVIVE;
+      this.timeLeft += survive ? -5 : 10;
+      this.modLabel = survive ? '보너스  버틸 시간 -5초' : '보너스  시간 +10초';
+    }
   }
 
   buildHud() {
@@ -44,9 +57,9 @@ export class BaseGame extends Phaser.Scene {
     const g = this.livesG;
     g.clear();
     const right = this.cfg.time ? W - 110 : W - 24;
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < this.maxLives; i++) {
       const x = right - i * 18;
-      if (2 - i < this.lives) { g.fillStyle(C.danger, 1); g.fillCircle(x, 40, 5); }
+      if (this.maxLives - 1 - i < this.lives) { g.fillStyle(C.danger, 1); g.fillCircle(x, 40, 5); }
       else { g.lineStyle(1.5, 0xffffff, 0.25); g.strokeCircle(x, 40, 5); }
     }
     if (this.cfg.time && this.timeLeft < 5) this.hudTime.setColor(css(C.danger));
@@ -59,7 +72,7 @@ export class BaseGame extends Phaser.Scene {
     items.push(dim, panel(this, W / 2, H / 2, 560, 280, { depth: 91, r: 20 }));
     items.push(chip(this, W / 2, H / 2 - 92, 'MISSION', this.accent, { depth: 92 }));
     items.push(T(this, W / 2, H / 2 - 22, this.cfg.brief, 22, C.text, { weight: '600', depth: 92, ls: 10 }));
-    items.push(T(this, W / 2, H / 2 + 38, `목표  ${this.cfg.goal}`, 14, C.muted, { depth: 92 }));
+    items.push(T(this, W / 2, H / 2 + 38, `목표  ${this.cfg.goal}` + (this.modLabel ? `   ·   ${this.modLabel}` : ''), 14, C.muted, { depth: 92 }));
     const go = () => {
       if (this.ready) return;
       sfx.click();
@@ -135,8 +148,8 @@ export class BaseGame extends Phaser.Scene {
     this.cleanup?.();
     sfx.lose();
     this.resultCard('게임 오버', C.danger, msg);
-    button(this, W / 2 - 104, H / 2 + 46, 190, 48, '다시 도전', () => this.scene.restart({ ch: this.ch }), { accent: this.accent, depth: 95 });
-    button(this, W / 2 + 104, H / 2 + 46, 190, 48, '타이틀로', () => this.scene.start('Title'), { variant: 'ghost', depth: 95 });
-    this.input.keyboard.once('keydown-R', () => this.scene.restart({ ch: this.ch }));
+    button(this, W / 2 - 104, H / 2 + 46, 190, 48, '다시 도전', () => this.scene.restart({ ch: this.ch, mod: this.mod }), { accent: this.accent, depth: 95 });
+    button(this, W / 2 + 104, H / 2 + 46, 190, 48, '선택지로', () => this.scene.start('Choice', { ch: this.ch }), { variant: 'ghost', depth: 95 });
+    this.input.keyboard.once('keydown-R', () => this.scene.restart({ ch: this.ch, mod: this.mod }));
   }
 }

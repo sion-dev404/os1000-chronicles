@@ -4,10 +4,13 @@ import { BaseGame } from './BaseGame.js';
 
 // 5장: 방어벽 이동으로 해킹 미사일 회피 (20초 생존)
 export class Dodge extends BaseGame {
+  // 버티기 게임이라 '시간 보너스'는 버틸 시간을 줄여준다
+  static SURVIVE = true;
+
   constructor() { super('Dodge'); }
 
   setup() {
-    this.goalN = this.cfg.time;
+    this.goalN = this.timeLeft;
     this.px = W / 2;
     this.aura = this.add.circle(this.px, H - 60, 40, this.accent, 0.12).setStrokeStyle(1, this.accent, 0.5).setDepth(5);
     this.player = T(this, this.px, H - 60, '🛡️', 52, '#fff', { depth: 6 });
@@ -15,12 +18,12 @@ export class Dodge extends BaseGame {
     this.spawnT = 0;
     this.invul = 0;
     this.cursors = this.input.keyboard.createCursorKeys();
-    this.input.on('pointermove', (p) => { if (this.ready) this.px = p.x; });
-    this.input.on('pointerdown', (p) => { if (this.ready) this.px = p.x; });
+    this.input.on('pointermove', (p) => { if (this.ready) this.px = p.worldX; });
+    this.input.on('pointerdown', (p) => { if (this.ready) this.px = p.worldX; });
   }
 
   tick(dt) {
-    this.score = this.cfg.time - this.timeLeft;
+    this.score = this.goalN - this.timeLeft;
     const sp = 520 * dt;
     if (this.cursors.left.isDown) this.px -= sp;
     if (this.cursors.right.isDown) this.px += sp;

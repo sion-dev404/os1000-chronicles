@@ -19,8 +19,17 @@ export const C = {
 
 export const css = (n) => '#' + n.toString(16).padStart(6, '0');
 
+// 화질 배율: 실제 화면 픽셀 수에 맞춰 캔버스를 크게 만들고(최대 3배), 카메라를 확대해 같은 좌표계를 쓴다
+export const S = Phaser.Math.Clamp(
+  Math.ceil((Math.max(window.innerWidth, window.innerHeight * (W / H)) * (window.devicePixelRatio || 1)) / W), 1, 3);
+
+export function hd(scene) {
+  scene.cameras.main.setZoom(S).centerOn(W / 2, H / 2);
+}
+
 export function T(scene, x, y, str, size = 24, color = C.text, o = {}) {
   const t = scene.add.text(x, y, str, {
+    resolution: S,
     fontFamily: FONT,
     fontSize: size + 'px',
     color,
@@ -109,6 +118,7 @@ export class Rain {
     this.items = [];
     for (let i = 0; i < count; i++) {
       const t = scene.add.text(Math.random() * W, Math.random() * H, this.pick(), {
+        resolution: S,
         fontFamily: FONT, fontSize: Math.round(size * (0.7 + Math.random() * 0.6)) + 'px', color,
       }).setAlpha(alpha * (0.4 + Math.random() * 0.6)).setDepth(depth).setOrigin(0.5);
       this.items.push({ t, v: 18 + Math.random() * 40 });

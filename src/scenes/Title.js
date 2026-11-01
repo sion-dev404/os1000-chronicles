@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { W, H, C, T, css, backdrop, button, Rain, save } from '../ui.js';
+import { W, H, C, T, css, hd, backdrop, button, Rain, save } from '../ui.js';
 import { sfx, bgm, toggleMute, isMuted } from '../audio.js';
 import { CHAPTERS } from '../story.js';
 
@@ -9,6 +9,7 @@ export class Title extends Phaser.Scene {
   constructor() { super('Title'); }
 
   create() {
+    hd(this);
     backdrop(this, GOLD);
     this.rain = new Rain(this, { chars: '01', count: 24, alpha: 0.1 });
 
@@ -29,7 +30,7 @@ export class Title extends Phaser.Scene {
       }
     }
 
-    T(this, W / 2, H - 30, '8개의 장 · 컷신과 미니게임 · 터치와 클릭만으로 플레이', 12, C.dim);
+    T(this, W / 2, H - 30, '8개의 장 · 이야기와 선택지, 미니게임 · 터치와 클릭만으로 플레이', 12, C.dim);
 
     this.mute = T(this, W - 28, 28, '', 13, C.muted, { ox: 1, weight: '600' }).setInteractive({ useHandCursor: true });
     const label = () => this.mute.setText(isMuted() ? '소리 끔' : '소리 켬');

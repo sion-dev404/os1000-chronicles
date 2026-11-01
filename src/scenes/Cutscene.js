@@ -1,11 +1,12 @@
 import Phaser from 'phaser';
-import { W, H, C, T, css, backdrop, panel, Rain } from '../ui.js';
+import { W, H, C, T, css, hd, backdrop, panel, button, Rain } from '../ui.js';
 import { sfx, bgm } from '../audio.js';
 import { CHAPTERS } from '../story.js';
 
-const BAR = 44;
+// 이야기 화면: 왼쪽은 챕터 그림 액자, 오른쪽은 그 챕터 이야기 전문 (타자기처럼 나오고, 누르면 바로 전부 표시)
+const FRAME = { x: 230, y: 272, s: 380 };
+const COL = { x: 470, w: 450 };
 
-// 이야기 영상: 레터박스 + 챕터 타이틀 카드 + 이모지 연출 + 타자기 자막, 자동 재생(클릭하면 빨리 넘김)
 export class Cutscene extends Phaser.Scene {
   constructor() { super('Cutscene'); }
 
@@ -14,106 +15,90 @@ export class Cutscene extends Phaser.Scene {
   create() {
     const cfg = (this.cfg = CHAPTERS[this.ch]);
     this.accent = cfg.accent;
-    this.li = -1;
-    this.typing = false;
-    this.leaving = false;
-    this.sprites = [];
-
+    hd(this);
     backdrop(this, this.accent);
-    this.rain = new Rain(this, { ...cfg.rain, color: css(this.accent), count: 22, alpha: 0.14 });
+    this.rain = new Rain(this, { ...cfg.rain, color: css(this.accent), count: 16, alpha: 0.1 });
     bgm(cfg.mood);
-    this.cameras.main.fadeIn(400, 11, 13, 20);
-
-    // 레터박스
-    this.add.rectangle(W / 2, BAR / 2, W, BAR, 0x000000).setDepth(60);
-    this.add.rectangle(W / 2, H - BAR / 2, W, BAR, 0x000000).setDepth(60);
-
-    // 자막
-    this.subPanel = panel(this, W / 2, 432, W - 140, 84, { fill: 0x000000, alpha: 0.5, stroke: false, r: 14, depth: 61 }).setAlpha(0);
-    this.sub = T(this, W / 2, 432, '', 19, C.text, { w: W - 200, depth: 62, ls: 8, weight: '500' });
-    this.next = T(this, W - 90, 462, '▾', 14, css(this.accent), { depth: 62 }).setAlpha(0);
-    this.tweens.add({ targets: this.next, y: 466, yoyo: true, repeat: -1, duration: 500 });
-
-    // 상단: 진행 점 + 건너뛰기
-    this.dots = cfg.lines.map((_, i) => this.add.circle(28 + i * 14, BAR / 2, 3, 0xffffff, 0.25).setDepth(70));
-    const skip = T(this, W - 24, BAR / 2, '건너뛰기  ›', 13, C.muted, { ox: 1, depth: 70, weight: '600' }).setInteractive({ useHandCursor: true });
-    skip.on('pointerover', () => skip.setColor(C.text));
-    skip.on('pointerout', () => skip.setColor(C.muted));
-    skip.on('pointerdown', (p, lx, ly, e) => { e?.stopPropagation?.(); this.leave(); });
-
-    this.input.on('pointerdown', () => this.advance());
-    this.input.keyboard.on('keydown-SPACE', () => this.advance());
-    this.input.keyboard.on('keydown-ENTER', () => this.advance());
+    this.cameras.main.fadeIn(450, 11, 13, 20);
     this.events.once('shutdown', () => (this.rain = null));
 
-    this.titleCard();
+    this.drawArt();
+    this.drawText();
+
+    this.input.on('pointerdown', () => { if (this.typing) this.finishTyping(); });
+    sfx.glitch();
   }
 
-  titleCard() {
-    const lab = this.ch < CHAPTERS.length - 1 ? `CHAPTER ${String(this.ch + 1).padStart(2, '0')}` : 'EPILOGUE';
-    const a = T(this, W / 2, 222, lab, 13, css(this.accent), { depth: 90, weight: '700', ls2: 4 }).setAlpha(0);
-    const line = this.add.rectangle(W / 2, 248, 0, 2, this.accent).setDepth(90);
-    const b = T(this, W / 2, 290, this.cfg.title, 44, C.text, { depth: 90, weight: '800', w: W - 120 }).setAlpha(0);
-    b.y += 12;
-    this.tweens.add({ targets: a, alpha: 1, duration: 500 });
-    this.tweens.add({ targets: line, width: 48, duration: 600, ease: 'Cubic.easeOut' });
-    this.tweens.add({ targets: b, alpha: 1, y: 290, duration: 700, ease: 'Cubic.easeOut', delay: 150 });
-    sfx.boom();
-    this.carding = true;
-    this.time.delayedCall(2100, () => {
-      this.tweens.add({ targets: [a, b, line], alpha: 0, duration: 400, onComplete: () => { a.destroy(); b.destroy(); line.destroy(); this.carding = false; this.showLine(0); } });
+  drawArt() {
+    const { x, y, s } = FRAME;
+    panel(this, x, y, s, s, { r: 24, alpha: 1 });
+    const glow = this.add.graphics();
+    for (let i = 0; i < 30; i++) {
+      glow.fillStyle(this.accent, 0.006);
+      glow.fillEllipse(x, y + 40, 60 + i * 10, 50 + i * 8);
+    }
+    glow.fillStyle(this.accent, 0.05).fillRoundedRect(x - s / 2, y - s / 2, s, s, 24);
+
+    const art = this.add.container(x, y);
+    this.cfg.art.forEach((a, i) => {
+      const isText = !/\p{Extended_Pictographic}/u.test(a.e);
+      const o = isText
+        ? T(this, a.x - s / 2, a.y - s / 2, a.e, a.z, css(this.accent), { weight: '800' })
+        : T(this, a.x - s / 2, a.y - s / 2, a.e, a.z);
+      art.add(o);
+      o.setScale(0.6).setAlpha(0);
+      this.tweens.add({ targets: o, scale: 1, alpha: 1, duration: 500, delay: 200 + i * 120, ease: 'Back.easeOut', onComplete: () => this.animate(o, a.a, i) });
     });
+    // 아주 느린 줌(켄 번스 효과)
+    this.tweens.add({ targets: art, scale: 1.04, yoyo: true, repeat: -1, duration: 6000, ease: 'Sine.easeInOut' });
   }
 
-  advance() {
-    if (this.leaving || this.carding) return;
-    if (this.typing) { this.finishTyping(); return; }
-    this.showLine(this.li + 1);
+  animate(o, kind, i) {
+    if (kind === 'bob') this.tweens.add({ targets: o, y: o.y - 8, yoyo: true, repeat: -1, duration: 1300 + i * 170, ease: 'Sine.easeInOut' });
+    if (kind === 'pulse') this.tweens.add({ targets: o, scale: 1.08, yoyo: true, repeat: -1, duration: 800 + i * 90, ease: 'Sine.easeInOut' });
+    if (kind === 'spin') this.tweens.add({ targets: o, angle: 360, repeat: -1, duration: 14000 });
+    if (kind === 'glitch') {
+      const bx = o.x;
+      this.time.addEvent({ delay: 140, loop: true, callback: () => {
+        const on = Math.random() < 0.25;
+        o.x = bx + (on ? Phaser.Math.Between(-5, 5) : 0);
+        o.setAlpha(on ? 0.55 : 1);
+      } });
+    }
   }
 
-  showLine(i) {
-    if (i >= this.cfg.lines.length) { this.leave(); return; }
-    this.li = i;
-    this.autoTimer?.remove();
-    const L = this.cfg.lines[i];
-    this.dots.forEach((d, k) => d.setFillStyle(k <= i ? this.accent : 0xffffff, k <= i ? 1 : 0.25));
+  drawText() {
+    const last = !this.cfg.game;
+    const lab = last ? 'EPILOGUE' : `CHAPTER ${String(this.ch + 1).padStart(2, '0')}`;
+    T(this, COL.x, 100, lab, 12, css(this.accent), { ox: 0, weight: '700', ls2: 3 });
+    T(this, COL.x, 130, this.cfg.title, 28, C.text, { ox: 0, weight: '800' });
+    this.add.rectangle(COL.x, 160, 32, 2, this.accent).setOrigin(0, 0.5);
 
-    // 연출 스프라이트
-    this.sprites.forEach((s) => this.tweens.add({ targets: s, alpha: 0, y: s.y - 20, duration: 250, onComplete: () => s.destroy() }));
-    this.sprites = [];
-    const n = L.s.length;
-    L.s.forEach((e, k) => {
-      const x = W / 2 + (k - (n - 1) / 2) * 200;
-      const isText = !/\p{Extended_Pictographic}/u.test(e);
-      const s = isText
-        ? T(this, x, 220, e, 48, css(this.accent), { depth: 10, weight: '800' })
-        : T(this, x, 220, e, 104, '#ffffff', { depth: 10 });
-      s.setScale(0.6).setAlpha(0);
-      this.tweens.add({
-        targets: s, scale: 1, alpha: 1, duration: 500, delay: k * 120, ease: 'Back.easeOut',
-        onComplete: () => this.tweens.add({ targets: s, y: s.y - 10, yoyo: true, repeat: -1, duration: 1100 + k * 150, ease: 'Sine.easeInOut' }),
-      });
-      this.sprites.push(s);
-    });
+    // 긴 글은 글자 크기를 줄여 한 화면에 다 들어가게 한다
+    let size = 16;
+    let body;
+    for (;;) {
+      body?.destroy();
+      body = T(this, COL.x, 180, this.cfg.story, size, '#c9cfdb', { ox: 0, oy: 0, w: COL.w, align: 'left', ls: Math.round(size * 0.6) });
+      if (body.height <= 250 || size <= 13) break;
+      size--;
+    }
+    // 타자기 효과 중 줄바꿈 위치가 흔들리지 않도록 미리 줄을 나눠둔다
+    this.full = body.getWrappedText(this.cfg.story).join('\n');
+    body.setWordWrapWidth(null).setText('');
+    this.body = body;
 
-    if (L.shake) this.cameras.main.shake(400, 0.008);
-    if (L.flash) this.cameras.main.flash(300, ...L.flash);
-    if (L.sfx && sfx[L.sfx]) sfx[L.sfx]();
+    this.btn = button(this, W - 40 - 100, 476, 200, 48, last ? '엔딩 보기' : '어떻게 할까?', () => this.leave(), { accent: this.accent });
+    this.btn.setAlpha(0);
 
-    // 자막 타자기
-    this.subPanel.setAlpha(1);
-    this.full = L.t;
-    this.sub.setText('');
-    this.next.setAlpha(0);
     this.typing = true;
     this.pos = 0;
-    this.typer?.remove();
     this.typer = this.time.addEvent({
-      delay: 32, loop: true,
+      delay: 18, loop: true, startAt: -900,
       callback: () => {
-        this.pos++;
-        this.sub.setText(this.full.slice(0, this.pos));
-        if (this.pos % 3 === 0) sfx.type();
+        this.pos += 1;
+        this.body.setText(this.full.slice(0, this.pos));
+        if (this.pos % 4 === 0) sfx.type();
         if (this.pos >= this.full.length) this.finishTyping();
       },
     });
@@ -121,20 +106,18 @@ export class Cutscene extends Phaser.Scene {
 
   finishTyping() {
     this.typer?.remove();
-    this.sub.setText(this.full);
+    this.body.setText(this.full);
     this.typing = false;
-    this.next.setAlpha(1);
-    this.autoTimer = this.time.delayedCall(2600 + this.full.length * 25, () => this.advance());
+    this.tweens.add({ targets: this.btn, alpha: 1, duration: 300 });
   }
 
   leave() {
     if (this.leaving) return;
     this.leaving = true;
     this.typer?.remove();
-    this.autoTimer?.remove();
-    this.cameras.main.fadeOut(450, 11, 13, 20);
+    this.cameras.main.fadeOut(400, 11, 13, 20);
     this.cameras.main.once('camerafadeoutcomplete', () => {
-      if (this.cfg.game) this.scene.start(this.cfg.game, { ch: this.ch });
+      if (this.cfg.game) this.scene.start('Choice', { ch: this.ch });
       else this.scene.start('Ending');
     });
   }

@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { W, H, C, T, css, backdrop, button, Rain, burst, save } from '../ui.js';
+import { W, H, C, T, css, hd, backdrop, button, Rain, burst, save } from '../ui.js';
 import { sfx, bgm } from '../audio.js';
 
 const GOLD = 0xf5c84c;
@@ -10,6 +10,7 @@ export class Ending extends Phaser.Scene {
 
   create() {
     save.max = 99;
+    hd(this);
     backdrop(this, GOLD);
     this.rain = new Rain(this, { chars: '·✦', color: css(GOLD), dir: -1, count: 30, alpha: 0.25 });
     bgm('epic');

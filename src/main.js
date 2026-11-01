@@ -1,8 +1,9 @@
 import Phaser from 'phaser';
 import 'pretendard/dist/web/static/pretendard-subset.css';
-import { W, H } from './ui.js';
+import { W, H, S } from './ui.js';
 import { Title } from './scenes/Title.js';
 import { Cutscene } from './scenes/Cutscene.js';
+import { Choice } from './scenes/Choice.js';
 import { Ending } from './scenes/Ending.js';
 import { Spell } from './games/Spell.js';
 import { Virus } from './games/Virus.js';
@@ -23,11 +24,11 @@ fontsReady.then(() => {
   window.__game = new Phaser.Game({
     type: Phaser.AUTO,
     parent: 'app',
-    width: W,
-    height: H,
+    width: W * S,
+    height: H * S,
     backgroundColor: '#0b0d14',
     scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH },
     input: { activePointers: 3 },
-    scene: [Title, Cutscene, Spell, Virus, Popup, OsOrder, Dodge, Timing, Whack, Boss, Ending],
+    scene: [Title, Cutscene, Choice, Spell, Virus, Popup, OsOrder, Dodge, Timing, Whack, Boss, Ending],
   });
 });
